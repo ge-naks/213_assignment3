@@ -8,6 +8,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
+import java.util.StringTokenizer;
+import java.time.LocalDate;
 
 
 public class StudioManagerController {
@@ -53,8 +55,18 @@ public class StudioManagerController {
         lname = lastName.getText();
     }
 
-    public void setDOB(){
-        
+    public String formatDate(String date){
+        StringTokenizer tokenizer = new StringTokenizer(date, "-");
+        String y = tokenizer.nextToken();
+        String m = tokenizer.nextToken();
+        String d = tokenizer.nextToken();
+
+        return m + "/"+d+"/"+y;
+    }
+
+    public void setDOB(ActionEvent event){
+        LocalDate date = dob.getValue();
+        errorMsg.setText(date.toString());
     }
 
 
