@@ -148,6 +148,24 @@ public class Date implements Comparable<Date> {
         return new Date(todayMonth, todayDay, todayYear);
     }
 
+    public boolean validDOB(){
+        Calendar today = Calendar.getInstance();
+        int currentYear = today.get(Calendar.YEAR);
+        int currentMonth = today.get(Calendar.MONTH) + 1;
+
+        int age = currentYear - this.getYear();
+        if (this.getMonth() > currentMonth || (this.getMonth() == currentMonth && this.getDay() > today.get(Calendar.DAY_OF_MONTH))) {
+            age--; // Reduce age if the birthday hasn't occurred yet this year
+        }
+
+        return age >= 18;
+
+    }
+
+    public boolean validDatePickerDOB(){
+        return !this.isFuture() && this.validDOB();
+    }
+
 
     /**
      * Compares two dates and determines which one is greater or if they are equal.
@@ -191,5 +209,8 @@ public class Date implements Comparable<Date> {
     public String toString() {
         return this.month + "/" + this.day + "/" + this.year;
     }
+
+
+
 
 }
