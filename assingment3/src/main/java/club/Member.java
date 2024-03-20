@@ -149,17 +149,5 @@ public class Member implements Comparable<Member> {
                 this.homeStudio.toString().toUpperCase();
     }
 
-    public static void main(String[] args) {
-        Date expiry = new Date("6/12/2024");
-        Date dob = new Date("12/14/2003");
-
-
-
-        Profile profile = new Profile("George", "Nakhla", dob );
-        Member member = new Member(profile,expiry,Location.BRIDGEWATER);
-
-        System.out.println(member);
-
-    }
 
 }

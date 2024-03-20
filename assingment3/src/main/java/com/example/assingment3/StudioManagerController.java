@@ -1,20 +1,27 @@
 package com.example.assingment3;
 
 import club.*;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Calendar;
+import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 
 
-public class StudioManagerController {
+public class StudioManagerController implements Initializable {
     @FXML
     private Label guestPassLabel, errorMsg;
 
@@ -30,7 +37,8 @@ public class StudioManagerController {
 
     @FXML
     private DatePicker dob;
-    @FXML
+
+
     private Schedule schedule;
 
     private String fname, lname, strDob, studio, membershipType;
@@ -38,6 +46,16 @@ public class StudioManagerController {
 
     @FXML
     private Button addButton, removeMember, loadMembers;
+
+    @FXML
+    private TableView<LocationData> studioLocationTable;
+
+    @FXML
+    private TableColumn<LocationData, String> city;
+    @FXML
+    private TableColumn<LocationData, String> zip;
+    @FXML
+    private TableColumn<LocationData, String> county;
 
     private Date dobFinal;
 
@@ -197,5 +215,50 @@ public class StudioManagerController {
         } else {
             errorMsg.setText("File empty!");
         }
+    }
+
+    ObservableList<LocationData> list = FXCollections.observableArrayList(
+            new LocationData("BRIDGEWATER", "08807", "SOMERSET"),
+            new LocationData("EDISON", "08837", "MIDDLESEX"),
+            new LocationData("FRANKLIN", "08873", "SOMERSET"),
+            new LocationData("PISCATAWAY", "08854", "MIDDLESEX"),
+            new LocationData("SOMERVILLE", "08876", "SOMERSET")
+    );
+
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        city.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCity()));
+        zip.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getZip()));
+        county.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCounty()));
+
+
+        studioLocationTable.setItems(list);
+    }
+
+
+}
+
+class LocationData {
+    private final String city;
+    private final String zip;
+    private final String county;
+
+    public LocationData(String city, String zip, String county) {
+        this.city = city;
+        this.zip = zip;
+        this.county = county;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getZip() {
+        return zip;
+    }
+
+    public String getCounty() {
+        return county;
     }
 }

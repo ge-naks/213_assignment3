@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<BorderPane xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.assingment3.StudioManagerController">
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.assingment3.StudioManagerController">
    <center>
       <TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="578.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
@@ -204,11 +204,11 @@
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <TableView layoutX="101.0" layoutY="59.0" prefHeight="200.0" prefWidth="415.0">
+                        <TableView fx:id="studioLocationTable" layoutX="101.0" layoutY="59.0" prefHeight="200.0" prefWidth="415.0">
                           <columns>
-                            <TableColumn prefWidth="100.0" text="City" />
-                            <TableColumn prefWidth="178.0" text="County" />
-                              <TableColumn prefWidth="106.0" text="Zip" />
+                            <TableColumn fx:id="city" prefWidth="100.0" text="City" />
+                            <TableColumn fx:id="county" prefWidth="178.0" text="County" />
+                              <TableColumn fx:id="zip" prefWidth="106.0" text="Zip" />
                           </columns>
                         </TableView>
                      </children></AnchorPane>
