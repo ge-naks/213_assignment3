@@ -185,9 +185,9 @@ public class MemberList {
 
 
 
-    public void printByCounty() {
-        System.out.println();
-        System.out.println("-list of members sorted by county then zipcode-");
+    public String printByCounty() {
+        StringBuilder result = new StringBuilder();
+        result.append("\n-list of members sorted by county then zipcode-\n");
 
         // Bubble sort implementation
         for (int i = 0; i < this.size - 1; i++) {
@@ -204,16 +204,20 @@ public class MemberList {
             }
         }
 
-        // Print the sorted members
+        // Append the sorted members to the result string
         for (int i = 0; i < this.size; i++) {
-            System.out.println(members[i]);
+            result.append(members[i]).append("\n");
         }
-        System.out.println("-end of list-");
-        System.out.println();
+        result.append("-end of list-\n\n");
+
+        return result.toString();
     }
 
 
-    public void printByMember() {
+
+    public String printByMember() {
+        StringBuilder result = new StringBuilder();
+
         // Bubble sort implementation
         for (int i = 0; i < size - 1; i++) {
             for (int j = 0; j < size - i - 1; j++) {
@@ -232,25 +236,31 @@ public class MemberList {
                 }
             }
         }
-        // Print the sorted members
+
+        // Build the string representation of sorted members
         for (int i = 0; i < size; i++) {
-            System.out.println(members[i]);
+            result.append(members[i]).append("\n");
         }
+
+        return result.toString();
     }
 
 
-    public void printFees() {
+    public String printFees() {
+        StringBuilder result = new StringBuilder();
 
-        System.out.println();
-        System.out.println("-list of members with next dues-");
-        for(int i = 0; i < size; i ++){
-            System.out.println(this.members[i]  +
-                      " [next due: $" + this.members[i].bill() + "]");
+        result.append("\n");
+        result.append("-list of members with next dues-\n");
+        for (int i = 0; i < size; i++) {
+            result.append(this.members[i])
+                    .append(" [next due: $")
+                    .append(this.members[i].bill())
+                    .append("]\n");
         }
-        System.out.println("-end of list-");
-        System.out.println();
+        result.append("-end of list-\n");
+        result.append("\n");
 
+        return result.toString();
     }
-
 
 }

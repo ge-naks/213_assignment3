@@ -8,11 +8,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -56,6 +54,9 @@ public class StudioManagerController implements Initializable {
     private TableColumn<LocationData, String> zip;
     @FXML
     private TableColumn<LocationData, String> county;
+
+    @FXML
+    private TextArea printByTextArea;
 
     private Date dobFinal;
 
@@ -200,10 +201,8 @@ public class StudioManagerController implements Initializable {
         fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Text files (*.txt)", "*.txt");
         fileChooser.getExtensionFilters().add(extFilter);
-
         File selectedFile = fileChooser.showOpenDialog(stage);
-
-
+        
         if (selectedFile != null) {
             try {
                 memberList.load(selectedFile);
@@ -224,6 +223,28 @@ public class StudioManagerController implements Initializable {
             new LocationData("PISCATAWAY", "08854", "MIDDLESEX"),
             new LocationData("SOMERVILLE", "08876", "SOMERSET")
     );
+
+    public void clickPrintProfile(ActionEvent event){
+        printByTextArea.setText(memberList.printByMember());
+    }
+
+    public void clickPrintCounty(ActionEvent event){
+        printByTextArea.setText(memberList.printByCounty());
+    }
+
+    public void clickPrintDues(ActionEvent event){
+        printByTextArea.setText(memberList.printFees());
+    }
+
+    public void clickClear(ActionEvent event){
+        printByTextArea.setText("");
+    }
+
+
+
+
+
+
 
 
     @Override

@@ -3,11 +3,15 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -216,7 +220,33 @@
             </Tab>
             <Tab text="Print By...">
               <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <MenuBar layoutX="14.0" layoutY="24.0">
+                          <menus>
+                            <Menu mnemonicParsing="false" text="Member">
+                              <items>
+                                <MenuItem mnemonicParsing="false" onAction="#clickPrintProfile" text="Print by Profile" />
+                                    <MenuItem mnemonicParsing="false" onAction="#clickPrintCounty" text="Print by County" />
+                                    <MenuItem mnemonicParsing="false" onAction="#clickPrintDues" text="Print dues" />
+                              </items>
+                            </Menu>
+                            <Menu mnemonicParsing="false" text="Fitness Classes">
+                              <items>
+                                <MenuItem mnemonicParsing="false" text="Show Schedule" />
+                                    <MenuItem mnemonicParsing="false" text="Show Attendees" />
+                                    <MenuItem mnemonicParsing="false" text="Show Studio Locations" />
+                              </items>
+                            </Menu>
+                            <Menu mnemonicParsing="false" text="Other">
+                              <items>
+                                <MenuItem mnemonicParsing="false" onAction="#clickClear" text="Clear Text Area" />
+                              </items>
+                            </Menu>
+                          </menus>
+                        </MenuBar>
+                        <TextArea fx:id="printByTextArea" layoutX="26.0" layoutY="72.0" prefHeight="448.0" prefWidth="548.0" />
+                     </children></AnchorPane>
               </content>
             </Tab>
         </tabs>
