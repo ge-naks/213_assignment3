@@ -14,6 +14,7 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.security.Key;
 import java.util.Calendar;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
@@ -21,32 +22,54 @@ import java.util.StringTokenizer;
 
 public class StudioManagerController implements Initializable {
     @FXML
-    private Label guestPassLabel, errorMsg;
+    private Label guestPassLabel, errorMsg, classSchedMsg, classErrorMsg;
 
     @FXML
-    private RadioButton basicButton, familyButton, premiumButton, LoadScheduleButton;
+    private RadioButton basicButton, familyButton, premiumButton;
 
     @FXML
     private RadioButton studioBridgewater, studioEdison, studioFranklin, studioPiscataway, studioSomerville,
             classBridgewater, classEdison, classFranklin, classPiscataway, classSomerville;
 
     @FXML
-    private TextField firstName, lastName;
+    private TextField firstName, lastName, classFName, classLName, remainingLabel;
 
     @FXML
-    private DatePicker dob;
+    private DatePicker dob, classDOB;
 
-
-    private Schedule schedule;
+    private Schedule schedule = new Schedule();
 
     private String fname, lname, strDob, studio, membershipType;
 
 
     @FXML
-    private Button addButton, removeMember, loadMembers;
+    private RadioButton instructorJennifer, instructorKim, instructorDenise, instructorDavis, instructorEmma;
+
+    @FXML
+    private RadioButton buttonCardio, buttonPilates, buttonSpinning;
+
+    @FXML
+    private Button addButton, removeMember, loadMembers, loadSchedule;
 
     @FXML
     private TableView<LocationData> studioLocationTable;
+
+    @FXML
+    private TableView<FitnessClass> scheduleTable;
+
+    @FXML
+    private TableColumn<FitnessClass, String> offer;
+
+    @FXML
+    private TableColumn<FitnessClass, String> instructor;
+
+    @FXML
+    private TableColumn<FitnessClass, String> studioLocation;
+
+    @FXML
+    private TableColumn<FitnessClass, String> time;
+
+
 
     @FXML
     private TableColumn<LocationData, String> city;
@@ -61,7 +84,79 @@ public class StudioManagerController implements Initializable {
     private Date dobFinal;
 
     private MemberList memberList = new MemberList();
-    private boolean loadedFlag = false;
+    private boolean loadedMembersFlag = false;
+    private boolean loadedScheduleFlag = false;
+
+    private String selectedOffer, selectedInstructor, selectedClassLocation, typedClassFName, typedClassLName;
+
+    private Date classDOBFinal;
+
+    public void classButtonClick(ActionEvent event){
+        if(buttonPilates.isSelected()){
+            selectedOffer = "PILATES";
+        }else if(buttonSpinning.isSelected()){
+            selectedOffer = "SPINNING";
+        }else{
+            selectedOffer = "CARDIO";
+        }
+    }
+
+    public void classInstructorClick(ActionEvent event){
+        if(instructorJennifer.isSelected()){
+            selectedInstructor = "Jennifer";
+        } else if (instructorKim.isSelected()) {
+            selectedInstructor = "Kim";
+        } else if (instructorDenise.isSelected()) {
+            selectedInstructor = "Denise";
+        }else if (instructorDavis.isSelected()){
+            selectedInstructor = "Davis";
+        }else{
+            selectedInstructor = "Emma";
+        }
+    }
+
+    public void classStudioClick(ActionEvent event){
+        if(classBridgewater.isSelected()){
+            selectedClassLocation = "BRIDGEWATER";
+        } else if (classEdison.isSelected()) {
+            selectedClassLocation = "EDISON";
+        } else if (classFranklin.isSelected()) {
+            selectedClassLocation = "FRANKLIN";
+        }else if(classPiscataway.isSelected()){
+            selectedClassLocation = "PISCATAWAY";
+        }else{
+            selectedClassLocation = "SOMERVILLE";
+        }
+    }
+
+    public void setClassFName(KeyEvent event){
+        classErrorMsg.setText("");
+        typedClassFName = classFName.getText();
+        classErrorMsg.setText(typedClassFName);
+    }
+
+    public void setClassLName(KeyEvent event){
+        classErrorMsg.setText("");
+        typedClassLName = classLName.getText();
+        classErrorMsg.setText(typedClassLName);
+    }
+
+    public void setClassDOB(ActionEvent event) {
+        classErrorMsg.setText("");
+        String strDob = formatDate(classDOB.getValue().toString());
+        Date testDate = new Date(strDob);
+        if (testDate.isFuture()) {
+            classErrorMsg.setText("Can't be Future Date!");
+        } else if (!testDate.validDOB()) {
+            classErrorMsg.setText("Must be 18 or older!");
+        } else {
+            classDOBFinal = testDate;
+        }
+    }
+
+
+
+
 
 
     public void memberButtonClick(ActionEvent event) {
@@ -137,7 +232,7 @@ public class StudioManagerController implements Initializable {
 
     public void clickAddMember(ActionEvent event) {
         errorMsg.setText("");
-        if (!loadedFlag) {
+        if (!loadedMembersFlag) {
             errorMsg.setText("Load members first!");
             return;
         }
@@ -165,16 +260,8 @@ public class StudioManagerController implements Initializable {
             Premium newPremium = new Premium(newProfile, expire, Location.valueOf(studio));
             if (!memberList.add(newPremium)) errorMsg.setText("Member Exists!");
         }
-        tempCheck();
     }
 
-    public void tempCheck() {
-        if (memberList.getSize() == 0) System.out.println("empty!");
-        for (int i = 0; i < memberList.getSize(); i++) {
-            System.out.println(memberList.getMembers()[i]);
-        }
-        System.out.println();
-    }
 
     public void clickRemoveMember(ActionEvent event) {
         errorMsg.setText("");
@@ -190,7 +277,6 @@ public class StudioManagerController implements Initializable {
         Member memberToRemove = new Member(newProfile);
 
         if (!memberList.remove(memberToRemove)) errorMsg.setText("Member not in list!");
-        tempCheck();
     }
 
     public void clickLoadMembers(ActionEvent event) throws IOException {
@@ -206,7 +292,7 @@ public class StudioManagerController implements Initializable {
         if (selectedFile != null) {
             try {
                 memberList.load(selectedFile);
-                loadedFlag = true;
+                loadedMembersFlag = true;
                 errorMsg.setText("File Loaded Successfully");
             } catch (Exception e) {
                 errorMsg.setText("Error loading file. Wrong file, perchance?");
@@ -223,6 +309,8 @@ public class StudioManagerController implements Initializable {
             new LocationData("PISCATAWAY", "08854", "MIDDLESEX"),
             new LocationData("SOMERVILLE", "08876", "SOMERSET")
     );
+
+
 
     public void clickPrintProfile(ActionEvent event){
         printByTextArea.setText(memberList.printByMember());
@@ -241,10 +329,142 @@ public class StudioManagerController implements Initializable {
     }
 
 
+    public void clickLoadSchedule(ActionEvent event){
+        errorMsg.setText("");
+        Stage stage = (Stage) addButton.getScene().getWindow();
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Text files (*.txt)", "*.txt");
+        fileChooser.getExtensionFilters().add(extFilter);
+        File selectedFile = fileChooser.showOpenDialog(stage);
+
+        if (selectedFile != null) {
+            try {
+                schedule.load(selectedFile);
+                loadedScheduleFlag = true;
+                classSchedMsg.setText("File Loaded Successfully");
+                ObservableList<FitnessClass> scheduleData = FXCollections.observableArrayList(schedule.getClasses());
+                scheduleTable.setItems(scheduleData);
+            } catch (Exception e) {
+                classSchedMsg.setText("Error loading file. Wrong file, perchance?");
+            }
+        } else {
+            classSchedMsg.setText("File empty!");
+        }
+    }
+
+    public static String getStringFromObservableList(ObservableList<LocationData> list) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (LocationData locationData : list) {
+            stringBuilder.append("City: ").append(locationData.getCity())
+                    .append(", Zip: ").append(locationData.getZip())
+                    .append(", County: ").append(locationData.getCounty())
+                    .append("\n");
+        }
+
+        // Remove the last newline character if the list is not empty
+        if (!list.isEmpty()) {
+            stringBuilder.setLength(stringBuilder.length() - 1);
+        }
+
+        return stringBuilder.toString();
+    }
+
+    public void clickShowLocations(ActionEvent event){
+        printByTextArea.setText(getStringFromObservableList(list));
+    }
+
+
+    public Time findClassTime(String offer, String instructor, String location){
+        Offer classType = Offer.valueOf(offer);
+        Instructor teacher = Instructor.valueOf(instructor);
+        Location studio = Location.valueOf(location);
+
+        FitnessClass[] currentClasses = schedule.getClasses();
+
+        for(int i = 0; i < schedule.getNumClasses(); i++){
+
+            if(currentClasses[i].getStudio() == studio && currentClasses[i].getClassInfo() == classType
+                    && currentClasses[i].getInstructor() == teacher){
+                return currentClasses[i].getTime();
+            }
+        }
+        return null;
+    }
 
 
 
+    public boolean findTimeConflict(Member member, Time time, Location location, Instructor instructor) {
+        for (FitnessClass fitnessClass : schedule.getClasses()) {
+            if (fitnessClass.getMembers().contains(member)) {
+                if (fitnessClass.getTime() == time) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
+
+    public void classAddMember(ActionEvent event){
+
+        int NOT_FOUND = -1;
+
+        if(!loadedScheduleFlag){
+            classErrorMsg.setText("Load schedule first!");
+            return;
+        }
+
+        if( selectedClassLocation == null || selectedInstructor == null || selectedOffer == null ||
+                classFName == null || classLName == null || classDOBFinal == null){
+            classErrorMsg.setText("Fill out all fields!");
+            return;
+        }
+        if(schedule.validGrouping(selectedOffer,selectedInstructor,selectedClassLocation) == NOT_FOUND){
+            classErrorMsg.setText("Invalid class! Refer to schedule for valid classes");
+            return;
+        }
+
+        Profile newProfile = new Profile(typedClassFName, typedClassLName, classDOBFinal);
+        Member newMember = new Member(newProfile);
+
+        if(!memberList.contains(newMember)){
+            classErrorMsg.setText("Member not in list!");
+            return;
+        }
+
+        int profileIndex = memberList.findProfileIndex(newProfile);
+        Date exp = memberList.getMembers()[profileIndex].getExpire();
+        Location studio = memberList.getMembers()[profileIndex].getHomeStudio();
+
+
+
+        Member fullMember = new Member(newProfile, exp, studio);
+
+        int index = this.schedule.validGrouping(selectedOffer,selectedInstructor,selectedClassLocation);
+        if(!schedule.getClasses()[index].addMember(fullMember)){
+            classErrorMsg.setText("Member already in class!");
+        }
+        Time classTime = findClassTime();
+        if(findTimeConflict(member, Time time, Location location, Instructor instructor))
+
+        remainingLabel.setText(fullMember.guestStatus());
+    }
+
+    public void classRemoveMember(ActionEvent event){
+
+    }
+
+    public void classAddGuest(ActionEvent event){
+
+    }
+
+
+    public void classRemoveGuest(ActionEvent event){
+
+    }
 
 
     @Override
@@ -253,6 +473,10 @@ public class StudioManagerController implements Initializable {
         zip.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getZip()));
         county.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCounty()));
 
+        offer.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getClassInfo().toString()));
+        instructor.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getInstructor().toString()));
+        studioLocation.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getStudio().toString()));
+        time.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getTime().toString()));
 
         studioLocationTable.setItems(list);
     }

@@ -47,6 +47,7 @@ public class MemberList {
         return NOT_FOUND;
     }
 
+
     public int findProfileIndex(Profile profile) {
         for (int i = 0; i < size; i++) {
             if (this.members[i].getProfile().equals(profile)) return i;
@@ -260,6 +261,15 @@ public class MemberList {
         result.append("-end of list-\n");
         result.append("\n");
 
+        return result.toString();
+    }
+
+    @Override
+    public String toString(){
+        StringBuilder result = new StringBuilder();
+        for(int i = 0; i < this.getSize(); i++){
+            result.append(this.members[i].toString());
+        }
         return result.toString();
     }
 

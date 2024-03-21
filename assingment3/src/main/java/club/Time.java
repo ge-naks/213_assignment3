@@ -24,6 +24,12 @@ public enum Time {
         String minuteString = (minute < 10) ? "0" + minute : String.valueOf(minute);
         return hourString + ":" + minuteString;
     }
+    @Override
+    public String toString(){
+        String hourString = String.valueOf(hour); // Remove leading zero formatting
+        String minuteString = (minute < 10) ? "0" + minute : String.valueOf(minute);
+        return hourString + ":" + minuteString;
+    }
 }
 
 

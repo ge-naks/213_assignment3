@@ -40,8 +40,9 @@ public class Member implements Comparable<Member> {
 
     }
 
-
-
+    public Date getExpire() {
+        return expire;
+    }
 
     public Profile getProfile() {
         return profile;
