@@ -463,6 +463,10 @@ public class StudioManagerController implements Initializable {
         Time classTime = findClassTime(selectedOffer, selectedInstructor, selectedClassLocation);
         int index = this.schedule.validGrouping(selectedOffer,selectedInstructor,selectedClassLocation);
 
+        if(memberList.getMembers()[profileIndex].expired()){
+            classErrorMsg.setText("Member expired!");
+            return;
+        }
 
         if (memberList.getMembers()[profileIndex] instanceof Basic && !studio.name().equals(selectedClassLocation)) {
             classErrorMsg.setText("Membership type is basic; must choose home studio!");
@@ -601,6 +605,11 @@ public class StudioManagerController implements Initializable {
         Location studio = memberList.getMembers()[profileIndex].getHomeStudio();
         Member fullMember = new Member(newProfile, exp, studio);
         int index = this.schedule.validGrouping(selectedOffer,selectedInstructor,selectedClassLocation);
+
+        if(memberList.getMembers()[profileIndex].expired()){
+            classErrorMsg.setText("Member expired!");
+            return;
+        }
 
         if (memberList.getMembers()[profileIndex] instanceof Basic) {
             classErrorMsg.setText("Membership type is basic; member cannot bring guest!");
