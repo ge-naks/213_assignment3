@@ -251,14 +251,17 @@ public class StudioManagerController implements Initializable {
             Profile newProfile = new Profile(fname, lname, dobFinal);
             Basic newBasic = new Basic(newProfile, expire, Location.valueOf(studio));
             if (!memberList.add(newBasic)) errorMsg.setText("Member Exists!");
+            errorMsg.setText("Member added!");
         } else if (membershipType.equals("Family")) {
             Profile newProfile = new Profile(fname, lname, dobFinal);
             Family newFamily = new Family(newProfile, expire, Location.valueOf(studio));
             if (!memberList.add(newFamily)) errorMsg.setText("Member Exists!");
+            errorMsg.setText("Member added!");
         } else {
             Profile newProfile = new Profile(fname, lname, dobFinal);
             Premium newPremium = new Premium(newProfile, expire, Location.valueOf(studio));
             if (!memberList.add(newPremium)) errorMsg.setText("Member Exists!");
+            errorMsg.setText("Member added!");
         }
     }
 
@@ -276,7 +279,10 @@ public class StudioManagerController implements Initializable {
         Profile newProfile = new Profile(fname, lname, dobFinal);
         Member memberToRemove = new Member(newProfile);
 
-        if (!memberList.remove(memberToRemove)) errorMsg.setText("Member not in list!");
+        if (!memberList.remove(memberToRemove)) {
+            errorMsg.setText("Member not in list!");
+        }
+        errorMsg.setText("Member removed!");
     }
 
     public void clickLoadMembers(ActionEvent event) throws IOException {
@@ -460,6 +466,7 @@ public class StudioManagerController implements Initializable {
 
         if (memberList.getMembers()[profileIndex] instanceof Basic && !studio.name().equals(selectedClassLocation)) {
             classErrorMsg.setText("Membership type is basic; must choose home studio!");
+            return;
         }
 
         if(alreadyInClass(classTime, Instructor.valueOf(selectedInstructor), fullMember)){
@@ -473,6 +480,7 @@ public class StudioManagerController implements Initializable {
         }
 
         schedule.getClasses()[index].addMember(fullMember);
+        classErrorMsg.setText("Added!");
 
         if (memberList.getMembers()[profileIndex] instanceof Basic) {
             remainingLabel.setText("N/A");
@@ -483,19 +491,194 @@ public class StudioManagerController implements Initializable {
         }
     }
 
+    public void clickShowSched(ActionEvent event){
+        printByTextArea.setText("Pilates Jennifer morning Bridgewater\n" +
+                "Spinning Jennifer afternoon Piscataway\n" +
+                "Cardio Jennifer evening Somerville\n" +
+                "Pilates Kim morning Franklin\n" +
+                "Spinning Kim afternoon Franklin\n" +
+                "Cardio Kim evening Piscataway\n" +
+                "Pilates Davis morning Piscataway\n" +
+                "Pilates Davis afternoon Edison\n" +
+                "Cardio Davis evening Bridgewater\n" +
+                "Spinning Denise morning Bridgewater\n" +
+                "Cardio Denise afternoon Somerville\n" +
+                "Spinning Denise evening Edison\n" +
+                "Spinning Emma morning Franklin\n" +
+                "Pilates Emma afternoon Edison\n" +
+                "Cardio Emma evening Edison");
+    }
+
+    public void printAttendance() {
+        StringBuilder attendanceString = new StringBuilder();
+        FitnessClass[] classes = schedule.getClasses();
+        for (int i = 0; i < schedule.getNumClasses(); i++) {
+            FitnessClass fitnessClass = classes[i];
+            attendanceString.append(fitnessClass).append("\n");
+            MemberList members = fitnessClass.getMembers();
+            MemberList guests = fitnessClass.getGuests();
+            if (members.getSize() > 0) {
+                attendanceString.append("[Attendees]\n");
+                for (int j = 0; j < members.getSize(); j++) {
+                    attendanceString.append("   ").append(members.getMembers()[j]).append("\n");
+                }
+            }
+
+            if (guests.getSize() > 0) {
+                attendanceString.append("[Guests]\n");
+                attendanceString.append("   ").append(guests.getMembers()[0]).append("\n");
+            }
+        }
+         printByTextArea.setText(attendanceString.toString());
+    }
+
+
     public void classRemoveMember(ActionEvent event){
+        classErrorMsg.setText("");
+
+        if(!loadedScheduleFlag){
+            classErrorMsg.setText("Load schedule first!");
+            return;
+        }
+
+        if( selectedClassLocation == null || selectedInstructor == null || selectedOffer == null ||
+                classFName == null || classLName == null || classDOBFinal == null){
+            classErrorMsg.setText("Fill out all fields!");
+            return;
+        }
+        int index = this.schedule.validGrouping(selectedOffer,selectedInstructor,selectedClassLocation);
+
+        String fname = classFName.getText();
+        String lname = classLName.getText();
+        Profile newProfile = new Profile(fname, lname, classDOBFinal);
+        Member newMember = new Member(newProfile);
 
 
+        Time time = findClassTime(selectedOffer, selectedInstructor, selectedClassLocation);
 
+        if(alreadyInClass(time, Instructor.valueOf(selectedInstructor), newMember)){
+            int profileIndex = memberList.findProfileIndex(newProfile);
+            Date exp = memberList.getMembers()[profileIndex].getExpire();
+            Location studio = memberList.getMembers()[profileIndex].getHomeStudio();
+            Member fullMember = new Member(newProfile, exp, studio);
+
+            schedule.getClasses()[index].removeMember(fullMember);
+            classErrorMsg.setText("Removed!");
+            return;
+        }
+        classErrorMsg.setText("Member not in class!");
     }
 
     public void classAddGuest(ActionEvent event){
+        classErrorMsg.setText("");
+        int NOT_FOUND = -1;
+
+        if(!loadedScheduleFlag){
+            classErrorMsg.setText("Load schedule first!");
+            return;
+        }
+
+        if( selectedClassLocation == null || selectedInstructor == null || selectedOffer == null ||
+                classFName == null || classLName == null || classDOBFinal == null){
+            classErrorMsg.setText("Fill out all fields!");
+            return;
+        }
+        if(schedule.validGrouping(selectedOffer,selectedInstructor,selectedClassLocation) == NOT_FOUND){
+            classErrorMsg.setText("Invalid class! Refer to schedule for valid classes");
+            return;
+        }
+
+        Profile newProfile = new Profile(typedClassFName, typedClassLName, classDOBFinal);
+        Member newMember = new Member(newProfile);
+
+        if(!memberList.contains(newMember)){
+            classErrorMsg.setText("Member not in list!");
+            return;
+        }
+
+        int profileIndex = memberList.findProfileIndex(newProfile);
+        Date exp = memberList.getMembers()[profileIndex].getExpire();
+        Location studio = memberList.getMembers()[profileIndex].getHomeStudio();
+        Member fullMember = new Member(newProfile, exp, studio);
+        int index = this.schedule.validGrouping(selectedOffer,selectedInstructor,selectedClassLocation);
+
+        if (memberList.getMembers()[profileIndex] instanceof Basic) {
+            classErrorMsg.setText("Membership type is basic; member cannot bring guest!");
+            return;
+        }
+
+        if (memberList.getMembers()[profileIndex] instanceof Family && !studio.name().equals(selectedClassLocation)) {
+            classErrorMsg.setText("Membership type is Family; member must bring guest to home studio!");
+            return;
+        }
+
+        if (memberList.getMembers()[profileIndex] instanceof Premium) {
+            if(!((Premium) memberList.getMembers()[profileIndex]).hasMorePass()){
+                classErrorMsg.setText("No more passes remaining!");
+                return;
+            }
+            if (schedule.getClasses()[index].addGuest(fullMember)) {
+                classErrorMsg.setText("Added Guest!");
+                ((Premium) memberList.getMembers()[profileIndex]).addGuest();
+                remainingLabel.setText(((Premium) memberList.getMembers()[profileIndex]).guestStatus());
+            }
+            return;
+        }
+        if(!((Family) memberList.getMembers()[profileIndex]).hasGuestOut()){
+            if (schedule.getClasses()[index].addGuest(fullMember)) {
+                classErrorMsg.setText("Added Guest!");
+                ((Family) memberList.getMembers()[profileIndex]).broughtGuest();
+                remainingLabel.setText(((Family) memberList.getMembers()[profileIndex]).guestStatus());
+            }
+        }else{
+            classErrorMsg.setText("No more guest passes remaining!");
+        }
 
     }
 
 
-    public void classRemoveGuest(ActionEvent event){
 
+
+    public void classRemoveGuest(ActionEvent event){
+        classErrorMsg.setText("");
+
+        if(!loadedScheduleFlag){
+            classErrorMsg.setText("Load schedule first!");
+            return;
+        }
+
+        if( selectedClassLocation == null || selectedInstructor == null || selectedOffer == null ||
+                classFName == null || classLName == null || classDOBFinal == null){
+            classErrorMsg.setText("Fill out all fields!");
+            return;
+        }
+        int index = this.schedule.validGrouping(selectedOffer,selectedInstructor,selectedClassLocation);
+
+        String fname = classFName.getText();
+        String lname = classLName.getText();
+        Profile newProfile = new Profile(fname, lname, classDOBFinal);
+        Member newMember = new Member(newProfile);
+
+
+        Time time = findClassTime(selectedOffer, selectedInstructor, selectedClassLocation);
+
+        if(alreadyInClassGuestClass(time, Instructor.valueOf(selectedInstructor), newMember, Offer.valueOf(selectedOffer),
+                Location.valueOf(selectedClassLocation))){
+            int profileIndex = memberList.findProfileIndex(newProfile);
+            Date exp = memberList.getMembers()[profileIndex].getExpire();
+            Location studio = memberList.getMembers()[profileIndex].getHomeStudio();
+            Member fullMember = new Member(newProfile, exp, studio);
+
+            schedule.getClasses()[index].removeGuest(fullMember);
+            classErrorMsg.setText("Removed!");
+            return;
+        }
+        classErrorMsg.setText("Member not in class!");
+    }
+
+    public boolean alreadyInClassGuestClass(Time time, Instructor instructor, Member member, Offer offer, Location location) {
+        int index = this.schedule.findIndexByAll(instructor, offer, location, time);
+        return this.schedule.getClasses()[index].getGuests().contains(member);
     }
 
 

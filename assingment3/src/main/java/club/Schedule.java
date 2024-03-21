@@ -74,6 +74,7 @@ public class Schedule {
     }
 
 
+
     public int findIndexByAll(Instructor instructor, Offer offer, Location location, Time time) {
         int NOT_FOUND = -1;
         for (int i = 0; i < classes.length; i++) {
@@ -88,27 +89,5 @@ public class Schedule {
         return NOT_FOUND;
     }
 
-    public void printAllMembers() {
-        for (int i = 0; i < numClasses; i++) {
-            FitnessClass fitnessClass = classes[i];
-            MemberList members = fitnessClass.getMembers();
-            MemberList guests = fitnessClass.getGuests();
-
-            System.out.println("Class: " + fitnessClass.getClassInfo().getName());
-            System.out.println("Members:");
-            printMembers(members);
-            System.out.println("Guests:");
-            printMembers(guests);
-            System.out.println();
-        }
-    }
-
-    private void printMembers(MemberList memberList) {
-        for (int i = 0; i < memberList.getSize(); i++) {
-            Member member = memberList.getMembers()[i];
-            System.out.println(member.toString());
-        }
-    }
-}
 
 }

@@ -236,8 +236,8 @@
                             </Menu>
                             <Menu mnemonicParsing="false" text="Fitness Classes">
                               <items>
-                                <MenuItem mnemonicParsing="false" text="Show Schedule" />
-                                    <MenuItem mnemonicParsing="false" text="Show Attendees" />
+                                <MenuItem mnemonicParsing="false" onAction="#clickShowSched" text="Show Schedule" />
+                                    <MenuItem mnemonicParsing="false" onAction="#printAttendance" text="Show Attendees" />
                                     <MenuItem mnemonicParsing="false" onAction="#clickShowLocations" text="Show Studio Locations" />
                               </items>
                             </Menu>
